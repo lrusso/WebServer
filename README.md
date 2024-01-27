@@ -2,7 +2,7 @@
 
 Very simple Node.js Web Server for serving files.
 
-## How to use it
+## How to use it:
 
 ```
 node server.js
