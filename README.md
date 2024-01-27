@@ -14,12 +14,6 @@ node server.js
 node server.js 9090
 ```
 
-### Running the Web server using two custom ports
-
-```
-node server.js 9090 9091
-```
-
 ### Using the Web server in the background
 
 1) Install Forever.
