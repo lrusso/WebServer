@@ -30,7 +30,6 @@ const handleRequest = (req, res) => {
   }
 
   const isTextFile =
-    fileName.indexOf(".js") === fileName.length - 3 ||
     fileName.indexOf(".htm") === fileName.length - 4 ||
     fileName.indexOf(".html") === fileName.length - 5 ||
     fileName.indexOf(".json") === fileName.length - 5 ||
