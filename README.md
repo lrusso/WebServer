@@ -2,8 +2,14 @@
 
 Simple Node.js Web Server for serving files.
 
-## How to use it:
+### Running the Web server:
 
 ```
-node server.js
+node server
+```
+
+### Running the Web server in the background:
+
+```
+node server &
 ```
