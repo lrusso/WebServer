@@ -1,2 +1,7 @@
-# simple-nodejs-webserver
-Simple Node.js Web Server
+# Simple Node.js Web Server
+
+## How to use it
+
+```
+node server.js
+```
