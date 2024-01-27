@@ -7,9 +7,3 @@ Simple Node.js Web Server for serving files.
 ```
 node server
 ```
-
-### Running the Web server in the background:
-
-```
-node server &
-```
