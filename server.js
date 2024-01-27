@@ -4,19 +4,18 @@ const fs = require("fs")
 const ROOT_FOLDER = "/public"
 const ERROR_FILE_NOT_FOUND = "File not found"
 
-const args = process.argv?.slice(2);
-const port1 = args.length > 0 ? args[0] : 8080;
+const args = process.argv?.slice(2)
+const port1 = args.length > 0 ? args[0] : 8080
 const port2 = args.length > 1 ? args[1] : undefined
 
 const handleRequest = (req, res) => {
-  const baseURL =  req.protocol + '://' + req.headers.host + '/';
-  const reqUrl = new URL(req.url,baseURL);
+  const baseURL = req.protocol + "://" + req.headers.host + "/"
+  const reqUrl = new URL(req.url, baseURL)
 
   let fileName = reqUrl.pathname
 
   // IF THERE IS NO FILENAME IN THE URL, USING THE DEFAULT FILENAME
-  fileName =
-    fileName === "/" ? ROOT_FOLDER + "/index.html" : ROOT_FOLDER + fileName
+  fileName = fileName === "/" ? ROOT_FOLDER + "/index.html" : ROOT_FOLDER + fileName
 
   // IF PATH/INDEX.HTML EXISTS, REDIRECTING TO IT
   if (fs.existsSync(__dirname + fileName + "/index.html")) {
