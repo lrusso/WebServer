@@ -5,8 +5,7 @@ const ROOT_FOLDER = "/public"
 const ERROR_FILE_NOT_FOUND = "File not found"
 
 const args = process.argv?.slice(2)
-const port1 = args.length > 0 ? args[0] : 8080
-const port2 = args.length > 1 ? args[1] : undefined
+const serverPort = args.length > 0 ? args[0] : 8080
 
 const handleRequest = (req, res) => {
   const baseURL = req.protocol + "://" + req.headers.host + "/"
@@ -57,8 +56,4 @@ const handleRequest = (req, res) => {
   })
 }
 
-http.createServer(handleRequest).listen(port1)
-
-if (port2) {
-  http.createServer(handleRequest).listen(port2)
-}
+http.createServer(handleRequest).listen(serverPort)
