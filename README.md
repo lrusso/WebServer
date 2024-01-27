@@ -5,5 +5,5 @@ Simple Node.js Web Server for serving files.
 ### Running the Web server:
 
 ```
-node server
+node server.js
 ```
