@@ -14,21 +14,21 @@ node server.js
 node server.js 9090
 ```
 
-### Using the Web server in the background
+### Running the Web server in the background
 
-1) Install Forever.
+* First, you need to install Forever.
    
 ```
 npm install forever -g
 ```
 
-2) Start the Web Server.
+* Then, for starting the Web Server:
 
 ```
 forever start server.js
 ```
 
-3) Stop the Web Server.
+* Finally, for stopping the Web Server:
 
 ```
 forever stop server.js
