@@ -19,7 +19,7 @@ node server.js 9090
 * First, you need to install Forever.
    
 ```
-npm install forever -g
+npm install -g forever
 ```
 
 * Then, for starting the Web Server:
