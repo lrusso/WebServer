@@ -28,28 +28,141 @@ const handleRequest = (req, res) => {
     return
   }
 
+  var fileExtension = fileName.split(".").pop().toLowerCase()
+
   const isTextFile =
-    fileName.indexOf(".htm") === fileName.length - 4 ||
-    fileName.indexOf(".html") === fileName.length - 5 ||
-    fileName.indexOf(".json") === fileName.length - 5 ||
-    fileName.indexOf(".txt") === fileName.length - 4 ||
-    fileName.indexOf(".md") === fileName.length - 3
+    fileExtension === "html" ||
+    fileExtension === ".html" ||
+    fileExtension === ".json" ||
+    fileExtension === ".txt" ||
+    fileExtension === ".md"
+
+  const getMimeType = () => {
+    switch (fileExtension) {
+      case "html":
+        return "text/html"
+
+      case "htm":
+        return "text/html"
+
+      case "css":
+        return "text/css"
+
+      case "csv":
+        return "text/csv"
+
+      case "pdf":
+        return "text/markdown"
+
+      case "js":
+        return "text/javascript"
+
+      case "json":
+        return "application/json"
+
+      case "txt":
+        return "text/plain"
+
+      case "md":
+        return "text/markdown"
+
+      case "zip":
+        return "application/zip"
+
+      case "7z":
+        return "application/x-7z-compressed"
+
+      case "gz":
+        return "application/gzip"
+
+      case "sh":
+        return "application/x-sh"
+
+      case "epub":
+        return "application/epub+zip"
+
+      case "doc":
+        return "application/msword"
+
+      case "docx":
+        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+      case "mp3":
+        return "audio/mpeg"
+
+      case "wav":
+        return "audio/wav"
+
+      case "flac":
+        return "audio/x-flac"
+
+      case "mp4":
+        return "video/mp4"
+
+      case "avi":
+        return "video/x-msvideo"
+
+      case "3gp":
+        return "video/3gpp"
+
+      case "mkv":
+        return "video/x-matroska"
+
+      case "mpg":
+        return "video/mpeg"
+
+      case "mpeg":
+        return "video/mpeg"
+
+      case "ico":
+        return "image/vnd.microsoft.icon"
+
+      case "png":
+        return "image/png"
+
+      case "jpg":
+        return "image/jpeg"
+
+      case "jpeg":
+        return "image/jpeg"
+
+      case "gif":
+        return "image/gif"
+
+      case "bmp":
+        return "image/bmp"
+
+      case "svg":
+        return "image/svg+xml"
+
+      default:
+        return "application/octet-stream"
+    }
+  }
 
   fs.readFile(__dirname + decodeURIComponent(fileName), "binary", (_, content) => {
     try {
       if (isTextFile) {
-        res.writeHead(200, { "Content-Length": content.length })
+        res.writeHead(200, {
+          "Content-Length": content.length,
+          "Content-Type": getMimeType(),
+        })
         res.write(content)
         res.end()
       } else {
         const binaryContent = Buffer.from(content, "binary")
         res.writeHead(200, {
           "Content-Length": binaryContent.length,
+          "Content-Type": getMimeType(),
         })
-        res.end(binaryContent)
+        res.write(binaryContent)
+        res.end()
       }
     } catch (err) {
-      res.writeHead(404, { "Content-Length": ERROR_FILE_NOT_FOUND.length })
+      res.writeHead(404, {
+        "Content-Length": ERROR_FILE_NOT_FOUND.length,
+        "Content-Type": "text/plain",
+      })
       res.write(ERROR_FILE_NOT_FOUND)
       res.end()
     }
