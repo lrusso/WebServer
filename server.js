@@ -105,11 +105,14 @@ const handleRequest = (req, res) => {
       case "mp3":
         return "audio/mpeg"
 
-      case "wav":
-        return "audio/wav"
+      case "aac":
+        return "audio/aac"
 
       case "flac":
         return "audio/x-flac"
+
+      case "wav":
+        return "audio/wav"
 
       case "mp4":
         return "video/mp4"
