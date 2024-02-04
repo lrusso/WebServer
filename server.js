@@ -8,8 +8,20 @@ const args = process.argv?.slice(2)
 const serverPort = args.length > 0 ? args[0] : 8080
 
 const handleRequest = (req, res) => {
-  const baseURL = req.protocol + "://" + req.headers.host + "/"
+  const baseURL =
+    (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
   const reqUrl = new URL(req.url, baseURL)
+
+  // CHECKING IF THE REQUEST IS ASKING FOR A RANGE
+  let dataRange = null
+  if (req.headers.range) {
+    try {
+      dataRange = req.headers.range.match(/[0-9].*-.*[0-9]/g)[0].split("-")
+      dataRange[1] = parseInt(dataRange[1]) + 1
+    } catch (err) {
+      //
+    }
+  }
 
   let fileName = reqUrl.pathname
 
@@ -114,6 +126,9 @@ const handleRequest = (req, res) => {
       case "wav":
         return "audio/wav"
 
+      case "ogg":
+        return "audio/ogg"
+
       case "mp4":
         return "video/mp4"
 
@@ -160,7 +175,12 @@ const handleRequest = (req, res) => {
 
   fs.readFile(__dirname + decodeURIComponent(fileName), "binary", (_, content) => {
     try {
-      const fileContent = isTextFile ? content : Buffer.from(content, "binary")
+      let fileContent = isTextFile ? content : Buffer.from(content, "binary")
+
+      if (dataRange) {
+        fileContent = fileContent.subarray(dataRange[0], dataRange[1])
+      }
+
       res.writeHead(200, {
         "Content-Length": fileContent.length,
         "Content-Type": getMimeType(),
