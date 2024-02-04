@@ -28,7 +28,7 @@ const handleRequest = (req, res) => {
     return
   }
 
-  var fileExtension = fileName.split(".").pop().toLowerCase()
+  const fileExtension = fileName.split(".").pop().toLowerCase()
 
   const isTextFile =
     fileExtension === "html" ||
