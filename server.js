@@ -142,22 +142,13 @@ const handleRequest = (req, res) => {
 
   fs.readFile(__dirname + decodeURIComponent(fileName), "binary", (_, content) => {
     try {
-      if (isTextFile) {
-        res.writeHead(200, {
-          "Content-Length": content.length,
-          "Content-Type": getMimeType(),
-        })
-        res.write(content)
-        res.end()
-      } else {
-        const binaryContent = Buffer.from(content, "binary")
-        res.writeHead(200, {
-          "Content-Length": binaryContent.length,
-          "Content-Type": getMimeType(),
-        })
-        res.write(binaryContent)
-        res.end()
-      }
+      const fileContent = isTextFile ? content : Buffer.from(content, "binary")
+      res.writeHead(200, {
+        "Content-Length": fileContent.length,
+        "Content-Type": getMimeType(),
+      })
+      res.write(fileContent)
+      res.end()
     } catch (err) {
       res.writeHead(404, {
         "Content-Length": ERROR_FILE_NOT_FOUND.length,
