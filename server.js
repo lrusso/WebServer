@@ -52,7 +52,7 @@ const handleRequest = (req, res) => {
         return "text/csv"
 
       case "pdf":
-        return "text/markdown"
+        return "application/pdf"
 
       case "js":
         return "text/javascript"
@@ -72,20 +72,35 @@ const handleRequest = (req, res) => {
       case "7z":
         return "application/x-7z-compressed"
 
+      case "rar":
+        return "application/x-rar-compressed"
+
       case "gz":
         return "application/gzip"
 
-      case "sh":
-        return "application/x-sh"
-
       case "epub":
         return "application/epub+zip"
+
+      case "rtf":
+        return "application/rtf"
 
       case "doc":
         return "application/msword"
 
       case "docx":
         return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+      case "xls":
+        return "application/vnd.ms-excel"
+
+      case "xlsx":
+        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+      case "ppt":
+        return "application/vnd.ms-powerpoint"
+
+      case "pptx":
+        return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
       case "mp3":
         return "audio/mpeg"
