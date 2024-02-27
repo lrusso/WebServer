@@ -2,6 +2,7 @@ const http = require("http")
 const fs = require("fs")
 
 const ROOT_FOLDER = "/public"
+const ERROR_FILE_TOO_BIG = "File too big"
 const ERROR_FILE_NOT_FOUND = "File not found"
 
 const args = process.argv?.slice(2)
@@ -173,29 +174,41 @@ const handleRequest = (req, res) => {
     }
   }
 
-  fs.readFile(__dirname + decodeURIComponent(fileName), "binary", (_, content) => {
-    try {
-      let fileContent = isTextFile ? content : Buffer.from(content, "binary")
+  fs.readFile(
+    __dirname + decodeURIComponent(fileName),
+    "binary",
+    (message, content) => {
+      try {
+        let fileContent = isTextFile ? content : Buffer.from(content, "binary")
 
-      if (dataRange) {
-        fileContent = fileContent.subarray(dataRange[0], dataRange[1])
+        if (dataRange) {
+          fileContent = fileContent.subarray(dataRange[0], dataRange[1])
+        }
+
+        res.writeHead(200, {
+          "Content-Length": fileContent.length,
+          "Content-Type": getMimeType(),
+        })
+        res.write(fileContent)
+        res.end()
+      } catch (err) {
+        if (message.code === "ERR_STRING_TOO_LONG") {
+          res.writeHead(500, {
+            "Content-Length": ERROR_FILE_TOO_BIG.length,
+            "Content-Type": "text/plain",
+          })
+          res.write(ERROR_FILE_TOO_BIG)
+        } else {
+          res.writeHead(404, {
+            "Content-Length": ERROR_FILE_NOT_FOUND.length,
+            "Content-Type": "text/plain",
+          })
+          res.write(ERROR_FILE_NOT_FOUND)
+        }
+        res.end()
       }
-
-      res.writeHead(200, {
-        "Content-Length": fileContent.length,
-        "Content-Type": getMimeType(),
-      })
-      res.write(fileContent)
-      res.end()
-    } catch (err) {
-      res.writeHead(404, {
-        "Content-Length": ERROR_FILE_NOT_FOUND.length,
-        "Content-Type": "text/plain",
-      })
-      res.write(ERROR_FILE_NOT_FOUND)
-      res.end()
     }
-  })
+  )
 }
 
 http.createServer(handleRequest).listen(serverPort)
