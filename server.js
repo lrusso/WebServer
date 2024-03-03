@@ -17,6 +17,7 @@ const handleRequest = (req, res) => {
   if (req.headers.range) {
     try {
       dataRange = req.headers.range.match(/[0-9].*-.*[0-9]/g)[0].split("-")
+      dataRange[0] = parseInt(dataRange[0])
       dataRange[1] = parseInt(dataRange[1]) + 1
     } catch (err) {
       //
@@ -167,38 +168,15 @@ const handleRequest = (req, res) => {
     }
   }
 
-  if (dataRange) {
-    fs.readFile(filePath, "binary", (_, content) => {
-      try {
-        const fileContent = Buffer.from(content, "binary").subarray(
-          dataRange[0],
-          dataRange[1]
-        )
-
-        res.writeHead(200, {
-          "Content-Length": fileContent.length,
-          "Content-Type": getMimeType(),
-        })
-        res.write(fileContent)
-        res.end()
-      } catch (err) {
-        res.writeHead(404, {
-          "Content-Length": ERROR_FILE_NOT_FOUND.length,
-          "Content-Type": "text/plain",
-        })
-        res.write(ERROR_FILE_NOT_FOUND)
-        res.end()
-      }
-    })
-    return
-  }
-
   try {
     const fileSize = fs.statSync(filePath).size
-    const readStream = fs.createReadStream(filePath)
+    const readStream = fs.createReadStream(
+      filePath,
+      dataRange ? { start: dataRange[0], end: dataRange[1] } : undefined
+    )
 
     res.writeHead(200, {
-      "Content-Length": fileSize,
+      "Content-Length": dataRange ? dataRange[1] - dataRange[0] : fileSize,
       "Content-Type": getMimeType(),
     })
 
