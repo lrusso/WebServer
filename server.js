@@ -170,13 +170,14 @@ const handleRequest = (req, res) => {
 
   try {
     const fileSize = fs.statSync(filePath).size
+    const rangeSize = dataRange ? dataRange[1] - dataRange[0] : null
     const readStream = fs.createReadStream(
       filePath,
       dataRange ? { start: dataRange[0], end: dataRange[1] } : undefined
     )
 
     res.writeHead(200, {
-      "Content-Length": dataRange ? dataRange[1] - dataRange[0] : fileSize,
+      "Content-Length": rangeSize ? rangeSize : fileSize,
       "Content-Type": getMimeType(),
     })
 
