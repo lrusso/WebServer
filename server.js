@@ -2,7 +2,6 @@ const http = require("http")
 const fs = require("fs")
 
 const ROOT_FOLDER = "/public"
-const ERROR_FILE_TOO_BIG = "File too big"
 const ERROR_FILE_NOT_FOUND = "File not found"
 
 const args = process.argv?.slice(2)
@@ -42,13 +41,7 @@ const handleRequest = (req, res) => {
   }
 
   const fileExtension = fileName.split(".").pop().toLowerCase()
-
-  const isTextFile =
-    fileExtension === "html" ||
-    fileExtension === ".html" ||
-    fileExtension === ".json" ||
-    fileExtension === ".txt" ||
-    fileExtension === ".md"
+  const filePath = __dirname + decodeURIComponent(fileName)
 
   const getMimeType = () => {
     switch (fileExtension) {
@@ -174,16 +167,13 @@ const handleRequest = (req, res) => {
     }
   }
 
-  fs.readFile(
-    __dirname + decodeURIComponent(fileName),
-    "binary",
-    (message, content) => {
+  if (dataRange) {
+    fs.readFile(filePath, "binary", (_, content) => {
       try {
-        let fileContent = isTextFile ? content : Buffer.from(content, "binary")
-
-        if (dataRange) {
-          fileContent = fileContent.subarray(dataRange[0], dataRange[1])
-        }
+        const fileContent = Buffer.from(content, "binary").subarray(
+          dataRange[0],
+          dataRange[1]
+        )
 
         res.writeHead(200, {
           "Content-Length": fileContent.length,
@@ -192,23 +182,45 @@ const handleRequest = (req, res) => {
         res.write(fileContent)
         res.end()
       } catch (err) {
-        if (message.code === "ERR_STRING_TOO_LONG") {
-          res.writeHead(500, {
-            "Content-Length": ERROR_FILE_TOO_BIG.length,
-            "Content-Type": "text/plain",
-          })
-          res.write(ERROR_FILE_TOO_BIG)
-        } else {
-          res.writeHead(404, {
-            "Content-Length": ERROR_FILE_NOT_FOUND.length,
-            "Content-Type": "text/plain",
-          })
-          res.write(ERROR_FILE_NOT_FOUND)
-        }
+        res.writeHead(404, {
+          "Content-Length": ERROR_FILE_NOT_FOUND.length,
+          "Content-Type": "text/plain",
+        })
+        res.write(ERROR_FILE_NOT_FOUND)
         res.end()
       }
-    }
-  )
+    })
+    return
+  }
+
+  try {
+    const fileSize = fs.statSync(filePath).size
+    const readStream = fs.createReadStream(filePath)
+
+    res.writeHead(200, {
+      "Content-Length": fileSize,
+      "Content-Type": getMimeType(),
+    })
+
+    readStream.on("data", (chunk) => {
+      res.write(chunk)
+    })
+
+    readStream.on("end", () => {
+      res.end()
+    })
+
+    readStream.on("error", () => {
+      res.end()
+    })
+  } catch (err) {
+    res.writeHead(404, {
+      "Content-Length": ERROR_FILE_NOT_FOUND.length,
+      "Content-Type": "text/plain",
+    })
+    res.write(ERROR_FILE_NOT_FOUND)
+    res.end()
+  }
 }
 
 http.createServer(handleRequest).listen(serverPort)
