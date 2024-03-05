@@ -5,6 +5,8 @@ const ROOT_FOLDER = "/public"
 const ERROR_FILE_NOT_FOUND = "File Not Found"
 const ERROR_INTERNAL_SERVER_ERROR = "Internal Server Error"
 
+const CHUNK_SIZE_IN_MB = 10
+
 const args = process.argv?.slice(2)
 const serverPort = args.length > 0 ? args[0] : 8080
 
@@ -52,7 +54,7 @@ const handleRequest = (req, res) => {
     const fileRangeEnd = fileRange
       ? fileRange[1]
         ? parseInt(fileRange[1])
-        : Math.min(fileRange[0] + 1048576, fileSize - 1)
+        : Math.min(fileRange[0] + CHUNK_SIZE_IN_MB * 1048576, fileSize - 1)
       : null
 
     const getMimeType = () => {
