@@ -186,7 +186,8 @@ const handleRequest = (req, res) => {
 
     if (fileRange) {
       res.writeHead(206, {
-        "Content-Range": "bytes " + (fileRangeStart - fileRangeEnd / fileSize),
+        "Content-Range":
+          "bytes " + fileRangeStart + "-" + fileRangeEnd + "/" + fileSize,
         "Content-Length": fileRangeEnd - fileRangeStart + 1,
         "Content-Type": getMimeType(),
         "Accept-Ranges": "bytes",
