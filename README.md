@@ -25,11 +25,11 @@ npm install -g forever
 * Then, for starting the Web Server:
 
 ```
-forever start server.js
+forever start -a -l /dev/null -c node server.js > /dev/null 2>&1
 ```
 
 * Finally, for stopping the Web Server:
 
 ```
-forever stop server.js
+forever stop -a -l /dev/null -c node server.js > /dev/null 2>&1
 ```
