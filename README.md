@@ -1,6 +1,6 @@
 # Simple Node.js Web Server
 
-Simple Node.js Web Server with SSL support.
+Simple Node.js Web server with SSL support.
 
 ## Running the Web server
 
