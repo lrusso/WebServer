@@ -16,14 +16,14 @@ node server.js 8080 4430
 
 ---
 
-### Workaround for browsing to a localhost using SSL
+### Workaround for browsing to localhost using SSL
 
 - Run ```node server.js```
 - Open Chrome and browse to ```https://localhost```
 - Click on **ADVANCED**.
 - Click on **Proceed to localhost (unsafe)**.
 
-Why is this workaround useful? Only for testing purposes and because, for example, you could have a Web App that may require access to your webcam and that is not allowed using a non-secure connection.
+This workaround is useful for testing purposes and because, for example, you could have a Web App that may require access to your webcam and that is not allowed using a non-secure connection.
 
 ---
 
