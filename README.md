@@ -11,8 +11,8 @@ Simple Node.js Web Server with SSL support.
 
 1. Run ```node server.js```
 2. Open Chrome and browse to ```https://localhost```
-3. Click on ```ADVANCED```.
-4. Click on ```Proceed to localhost (unsafe)```.
+3. Click on ```ADVANCED```
+4. Click on ```Proceed to localhost (unsafe)```
 
 This workaround is useful for testing purposes because, for example, a Web App may require access to the webcam and that is not allowed using a non-secure connection.
 
