@@ -2,30 +2,17 @@
 
 Simple Node.js Web Server with SSL support.
 
-### Running the Web server
+## Running the Web server
 
-```
-node server.js
-```
-
-### Running the Web server using a custom ports
-
-```
-node server.js 8080 4430
-```
-
----
+* Standard ports: ```node server.js```
+* Customs ports: ```node server.js 8080 4430```
 
 ### Workaround for browsing to localhost using SSL
 
-- Run ```node server.js```
-- Open Chrome and browse to ```https://localhost```
-- Click on **ADVANCED**.
-- Click on **Proceed to localhost (unsafe)**.
-
-This workaround is useful for testing purposes because, for example, a Web App may require access to the webcam and that is not allowed using a non-secure connection.
-
----
+1. Run ```node server.js```
+2. Open Chrome and browse to ```https://localhost```
+3. Click on **ADVANCED**.
+4. Click on **Proceed to localhost (unsafe)**.
 
 ### Running the Web server in the background
 
