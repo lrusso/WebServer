@@ -8,7 +8,7 @@ Simple Node.js Web Server for serving files.
 node server.js
 ```
 
-### Running the Web server using a custom port
+### Running the Web server using a custom ports
 
 ```
 node server.js 8080 4430
