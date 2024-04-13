@@ -23,7 +23,7 @@ node server.js 8080 4430
 - Click on **ADVANCED**.
 - Click on **Proceed to localhost (unsafe)**.
 
-This workaround is useful for testing purposes and because, for example, you could have a Web App that may require access to your webcam and that is not allowed using a non-secure connection.
+This workaround is useful for testing purposes because, for example, a Web App may require access to your webcam and that is not allowed using a non-secure connection.
 
 ---
 
