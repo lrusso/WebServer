@@ -2,7 +2,7 @@
 
 Simple Node.js Web Server for serving files.
 
-### Running the Web server using the default port (80) and a https port (443)
+### Running the Web server using the default port (80) and a SSL port (443)
 
 ```
 node server.js
