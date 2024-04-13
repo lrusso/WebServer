@@ -8,6 +8,15 @@ Simple Node.js Web Server for serving files.
 node server.js
 ```
 
+### Workaround for browsing to SSL
+
+- Run ```node server.js```
+- Open Chrome and browse to ```https://localhost```
+- Click on **ADVANCED**.
+- Click on **Proceed to localhost (unsafe)**.
+
+**NOTE**: Why is this workaround useful? Only for testing purposes and because, for example, you could have a Web App that may require access to your webcam and that is not allowed using a non-secure connection.
+
 ### Running the Web server using a custom ports
 
 ```
