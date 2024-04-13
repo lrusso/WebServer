@@ -1,3 +1,4 @@
+const https = require("https")
 const http = require("http")
 const fs = require("fs")
 
@@ -8,7 +9,8 @@ const ERROR_INTERNAL_SERVER_ERROR = "Internal Server Error"
 const CHUNK_SIZE_IN_MB = 10
 
 const args = process.argv?.slice(2)
-const serverPort = args.length > 0 ? args[0] : 8080
+const serverPort = args.length > 0 ? args[0] : 80
+const serverSSLPort = args.length > 1 ? args[1] : 443
 
 const handleRequest = (req, res) => {
   const baseURL =
@@ -214,4 +216,28 @@ const handleRequest = (req, res) => {
   }
 }
 
-http.createServer(handleRequest).listen(serverPort)
+try {
+  http.createServer(handleRequest).listen(serverPort)
+} catch (err) {
+  console.log(err)
+}
+
+try {
+  https
+    .createServer(
+      {
+        key: "-----BEGIN RSA PRIVATE KEY-----\nMIICXQIBAAKBgQC+kN7aXygeOp2/bB+GrER7AiTQuizpwK19whemmFTtsu79JgWS\nADkdUfhPeJrmBPHJnhGWskLUoWyqLYM1GCfDNAyojmyW9ZFwCCiLaUuHn+Usg7+v\ndcKIGV8MKWrjojtlQatsLa2K01v9CWbaJz9p0VNLUw1l9yh5TZQCroo87QIDAQAB\nAoGAD6w+h9s3o3TSsIGl/h+A6lT8ziXht7/fBO7Hny38HiiPO0a7Qoy+JckuEOss\nYiqZ8CkN7UTv9ijolP51QhKggmsHvk/wX79xnHmQLgl/mY0yPxH6KDBihHK3J+lu\nHnH9Dk+b2VOx63+6nmF38X0GPBeQR7HBIcTl8VgZmmwdr0kCQQDraPL124EeLjGu\nAQsfeOZaZUain83jc1FouBeJ3j3X3iWKlyuZgD3e+ALV+U6Fzv379x9eBmUwGap2\ncEYt4mXbAkEAzzvSG7dhpxFdjF+QjAxt8E1x+udakGBFvCoz9EeYZEXd8CkzZZKB\nBrfZVHgjkd+yhCAT7D+8MV271xg3uAe21wJBAOYhM5p7Gg8p83D6HiiHJRFrfhDO\njhRzEDuB86jYdLaJuUNxorKttk45P3R0Ano2rv3ZSHW/ZL4P6R9dhI2ojA8CQQCK\nKtlAL3kFObfEcqbeKR9Xm1sGLSAdqIJ2HTE8ikuZd1es2ttwukgaYZOeFOeqR5ov\nK2/9ENV5mIQ3uebUZRhLAkAWmRDcafDV1lXnzqGMVvDWwQ9UoCnJueDJCFLqK+ra\nzo+8drKU+VqY6ymQpPPYj2fUaYgwqvTvRxykzZjS/0MB\n-----END RSA PRIVATE KEY-----".replace(
+          /\\n/g,
+          "\n"
+        ),
+        cert: "-----BEGIN CERTIFICATE-----\nMIIB/TCCAWYCCQDK5QPVVgU3jzANBgkqhkiG9w0BAQUFADBDMQswCQYDVQQGEwJV\nUzETMBEGA1UECBMKQ2FsaWZvcm5pYTESMBAGA1UEBxMJU2FuIE1hdGVvMQswCQYD\nVQQKEwJTTDAeFw0xNDAxMzExODQzNTFaFw0xNDAzMDIxODQzNTFaMEMxCzAJBgNV\nBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRIwEAYDVQQHEwlTYW4gTWF0ZW8x\nCzAJBgNVBAoTAlNMMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+kN7aXyge\nOp2/bB+GrER7AiTQuizpwK19whemmFTtsu79JgWSADkdUfhPeJrmBPHJnhGWskLU\noWyqLYM1GCfDNAyojmyW9ZFwCCiLaUuHn+Usg7+vdcKIGV8MKWrjojtlQatsLa2K\n01v9CWbaJz9p0VNLUw1l9yh5TZQCroo87QIDAQABMA0GCSqGSIb3DQEBBQUAA4GB\nAKAEe950tCwT7ysq6KvlEDLrYu9wqjgd/VaXub6TX/HOT5n5naxoOJJpDDuTfUhX\nKmBl3hpm6zvSDCr4X40LIZJVIoKvLmJwkVZ8Ywk10v6qRRRx9djycB2AYPBmXUIX\nIaVfh2k2z6Kg191s7BKZREw0xRQh4giNKls9FsiZeM8E\n-----END CERTIFICATE-----".replace(
+          /\\n/g,
+          "\n"
+        ),
+      },
+      handleRequest
+    )
+    .listen(serverSSLPort)
+} catch (err) {
+  console.log(err)
+}
