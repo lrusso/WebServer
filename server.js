@@ -20,8 +20,20 @@ const handleRequest = (req, res) => {
   // IF THERE IS NO FILENAME IN THE URL, USING THE DEFAULT FILENAME
   const fileName =
     reqUrl.pathname === "/"
-      ? ROOT_FOLDER + "/index.html"
+      ? ROOT_FOLDER
       : ROOT_FOLDER + reqUrl.pathname
+
+  // PREVENTING TO BROWSE TO A URL THAT ENDS WITH A SLASH
+  if (fileName.substring(fileName.length-1,fileName.length)=== "/") {
+    const normalizedURL =
+      fileName.substring(ROOT_FOLDER.length, fileName.length - 1)
+
+    res.writeHead(302, {
+      Location: normalizedURL,
+    })
+    res.end()
+    return
+  }
 
   // IF PATH/INDEX.HTML EXISTS, REDIRECTING TO IT
   if (fs.existsSync(__dirname + fileName + "/index.html")) {
@@ -67,15 +79,15 @@ const handleRequest = (req, res) => {
 
     const contentHeader =
       `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Index of ` +
-      folderName +
+      (folderName !== "" ? folderName : "/") +
       `</title></head><body><h1>Index of ` +
-      folderName +
+      (folderName !== "" ? folderName : "/") +
       `</h1><table><tr><td colspan="2"><hr></td></tr>`
 
-    let contentBody =
+    let contentBody = fileName !== ROOT_FOLDER ?
       `<tr><td>[DIR]</td><td><a href="` +
       (folderUp !== "" ? folderUp : "/") +
-      `">..</a></td></tr>`
+      `">..</a></td></tr>` : ""
     folderContent.forEach((file) => {
       contentBody =
         contentBody +
