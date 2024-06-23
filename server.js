@@ -18,15 +18,12 @@ const handleRequest = (req, res) => {
   const reqUrl = new URL(req.url, baseURL)
 
   // IF THERE IS NO FILENAME IN THE URL, USING THE DEFAULT FILENAME
-  const fileName =
-    reqUrl.pathname === "/"
-      ? ROOT_FOLDER
-      : ROOT_FOLDER + reqUrl.pathname
+  let fileName =
+    reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
 
   // PREVENTING TO BROWSE TO A URL THAT ENDS WITH A SLASH
-  if (fileName.substring(fileName.length-1,fileName.length)=== "/") {
-    const normalizedURL =
-      fileName.substring(ROOT_FOLDER.length, fileName.length - 1)
+  if (fileName.substring(fileName.length - 1, fileName.length) === "/") {
+    const normalizedURL = fileName.substring(ROOT_FOLDER.length, fileName.length - 1)
 
     res.writeHead(302, {
       Location: normalizedURL,
@@ -35,16 +32,9 @@ const handleRequest = (req, res) => {
     return
   }
 
-  // IF PATH/INDEX.HTML EXISTS, REDIRECTING TO IT
+  // IF PATH/INDEX.HTML EXISTS, IT WILL BE READ
   if (fs.existsSync(__dirname + fileName + "/index.html")) {
-    const redirectedURL =
-      fileName.substring(ROOT_FOLDER.length, fileName.length) + "/index.html"
-
-    res.writeHead(302, {
-      Location: redirectedURL,
-    })
-    res.end()
-    return
+    fileName = fileName + "/index.html"
   }
 
   const requestedPath = __dirname + decodeURIComponent(fileName)
@@ -84,10 +74,12 @@ const handleRequest = (req, res) => {
       (folderName !== "" ? folderName : "/") +
       `</h1><table><tr><td colspan="2"><hr></td></tr>`
 
-    let contentBody = fileName !== ROOT_FOLDER ?
-      `<tr><td>[DIR]</td><td><a href="` +
-      (folderUp !== "" ? folderUp : "/") +
-      `">..</a></td></tr>` : ""
+    let contentBody =
+      fileName !== ROOT_FOLDER
+        ? `<tr><td>[DIR]</td><td><a href="` +
+          (folderUp !== "" ? folderUp : "/") +
+          `">..</a></td></tr>`
+        : ""
     folderContent.forEach((file) => {
       contentBody =
         contentBody +
