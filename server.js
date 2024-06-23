@@ -35,12 +35,69 @@ const handleRequest = (req, res) => {
     return
   }
 
-  if (!fs.existsSync(__dirname + decodeURIComponent(fileName))) {
+  const requestedPath = __dirname + decodeURIComponent(fileName)
+
+  if (!fs.existsSync(requestedPath)) {
     res.writeHead(404, {
       "Content-Length": ERROR_FILE_NOT_FOUND.length,
       "Content-Type": "text/plain",
     })
     res.write(ERROR_FILE_NOT_FOUND)
+    res.end()
+    return
+  }
+
+  if (fs.lstatSync(requestedPath).isDirectory()) {
+    const folderName = decodeURIComponent(fileName).substring(
+      ROOT_FOLDER.length,
+      decodeURIComponent(fileName).length
+    )
+    const folderUp = folderName.substring(0, folderName.lastIndexOf("/"))
+    const folderContent = fs.readdirSync(requestedPath).sort((a, b) => {
+      const aIsDir = fs.statSync(requestedPath + "/" + a).isDirectory(),
+        bIsDir = fs.statSync(requestedPath + "/" + b).isDirectory()
+      if (aIsDir && !bIsDir) {
+        return -1
+      }
+      if (!aIsDir && bIsDir) {
+        return 1
+      }
+      return a.localeCompare(b)
+    })
+
+    const contentHeader =
+      `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Index of ` +
+      folderName +
+      `</title></head><body><h1>Index of ` +
+      folderName +
+      `</h1><table><tr><td colspan="2"><hr></td></tr>`
+
+    let contentBody =
+      `<tr><td>[DIR]</td><td><a href="` +
+      (folderUp !== "" ? folderUp : "/") +
+      `">..</a></td></tr>`
+    folderContent.forEach((file) => {
+      contentBody =
+        contentBody +
+        "<tr><td>" +
+        (fs.lstatSync(requestedPath + "/" + file).isDirectory() ? "[DIR]" : "") +
+        '</td><td><a href="' +
+        folderName +
+        "/" +
+        file +
+        '">' +
+        file +
+        "</a></td></tr>"
+    })
+
+    const contentFooter = `<tr><td colspan="2"><hr></td></tr></table></body></html>`
+
+    res.writeHead(200, {
+      "Content-Length":
+        contentHeader.length + contentBody.length + contentFooter.length,
+      "Content-Type": "text/html",
+    })
+    res.write(contentHeader + contentBody + contentFooter)
     res.end()
     return
   }
