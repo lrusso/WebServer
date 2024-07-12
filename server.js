@@ -72,7 +72,7 @@ const handleRequest = (req, res) => {
       (folderName !== "" ? folderName : "/") +
       `</title></head><body><h1>Index of ` +
       (folderName !== "" ? folderName : "/") +
-      `</h1><table><tr><td colspan="2"><hr></td></tr>`
+      `</h1><hr><table>`
 
     let contentBody =
       fileName !== ROOT_FOLDER
@@ -94,7 +94,7 @@ const handleRequest = (req, res) => {
         "</a></td></tr>"
     })
 
-    const contentFooter = `<tr><td colspan="2"><hr></td></tr></table></body></html>`
+    const contentFooter = `</table><hr></body></html>`
 
     res.writeHead(200, {
       "Content-Length":
