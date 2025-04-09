@@ -12,6 +12,24 @@ const args = process.argv?.slice(2)
 const serverPort = args.length > 0 ? args[0] : 80
 const serverSSLPort = args.length > 1 ? args[1] : 443
 
+const isFolder = (path) => {
+  try {
+    const stats = fs.statSync(path)
+    return stats.isDirectory()
+  } catch (error) {
+    return false
+  }
+}
+
+const isFile = (path) => {
+  try {
+    const stats = fs.statSync(path)
+    return stats.isFile()
+  } catch (error) {
+    return false
+  }
+}
+
 const handleRequest = (req, res) => {
   const baseURL =
     (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
@@ -21,8 +39,8 @@ const handleRequest = (req, res) => {
   let fileName =
     reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
 
-  // PREVENTING TO BROWSE TO A URL THAT ENDS WITH A SLASH
-  if (fileName.substring(fileName.length - 1, fileName.length) === "/") {
+  // PREVENTING TO BROWSE TO A URL THAT ENDS WITH A SLASH (UNLESS IT'S THE ROOT)
+  if (fileName !== ROOT_FOLDER && fileName.endsWith("/")) {
     const normalizedURL = fileName.substring(ROOT_FOLDER.length, fileName.length - 1)
 
     res.writeHead(302, {
@@ -33,8 +51,17 @@ const handleRequest = (req, res) => {
   }
 
   // IF PATH/INDEX.HTML EXISTS, IT WILL BE READ
-  if (fs.existsSync(__dirname + fileName + "/index.html")) {
-    fileName = fileName + "/index.html"
+  if (
+    isFolder(__dirname + decodeURIComponent(fileName)) &&
+    isFile(__dirname + decodeURIComponent(fileName) + "/index.html")
+  ) {
+    const normalizedURL =
+      fileName.substring(ROOT_FOLDER.length, fileName.length) + "/index.html"
+    res.writeHead(302, {
+      Location: normalizedURL,
+    })
+    res.end()
+    return
   }
 
   const requestedPath = __dirname + decodeURIComponent(fileName)
@@ -49,15 +76,15 @@ const handleRequest = (req, res) => {
     return
   }
 
-  if (fs.lstatSync(requestedPath).isDirectory()) {
+  if (isFolder(requestedPath)) {
     const folderName = decodeURIComponent(fileName).substring(
       ROOT_FOLDER.length,
       decodeURIComponent(fileName).length
     )
     const folderUp = folderName.substring(0, folderName.lastIndexOf("/"))
     const folderContent = fs.readdirSync(requestedPath).sort((a, b) => {
-      const aIsDir = fs.statSync(requestedPath + "/" + a).isDirectory(),
-        bIsDir = fs.statSync(requestedPath + "/" + b).isDirectory()
+      const aIsDir = isFolder(requestedPath + "/" + a),
+        bIsDir = isFolder(requestedPath + "/" + b)
       if (aIsDir && !bIsDir) {
         return -1
       }
@@ -84,7 +111,7 @@ const handleRequest = (req, res) => {
       contentBody =
         contentBody +
         "<tr><td>" +
-        (fs.lstatSync(requestedPath + "/" + file).isDirectory() ? "[DIR]" : "") +
+        (isFolder(requestedPath + "/" + file) ? "[DIR]" : "") +
         '</td><td><a href="' +
         folderName +
         "/" +
