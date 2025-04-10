@@ -39,32 +39,51 @@ const handleRequest = (req, res) => {
   let fileName =
     reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
 
-  // PREVENTING TO BROWSE TO A URL THAT ENDS WITH A SLASH (UNLESS IT'S THE ROOT)
-  if (fileName !== ROOT_FOLDER && fileName.endsWith("/")) {
-    const normalizedURL = fileName.substring(ROOT_FOLDER.length, fileName.length - 1)
-
-    res.writeHead(302, {
-      Location: normalizedURL,
-    })
-    res.end()
-    return
-  }
-
-  // IF PATH/INDEX.HTML EXISTS, IT WILL BE READ
-  if (
-    isFolder(__dirname + decodeURIComponent(fileName)) &&
-    isFile(__dirname + decodeURIComponent(fileName) + "/index.html")
-  ) {
-    const normalizedURL =
-      fileName.substring(ROOT_FOLDER.length, fileName.length) + "/index.html"
-    res.writeHead(302, {
-      Location: normalizedURL,
-    })
-    res.end()
-    return
-  }
-
   const requestedPath = __dirname + decodeURIComponent(fileName)
+  const indexPath = __dirname + decodeURIComponent(fileName) + "/index.html"
+  const rootIndexPath = __dirname + decodeURIComponent(ROOT_FOLDER) + "/index.html"
+
+  if (reqUrl.pathname === "/" && isFile(rootIndexPath)) {
+    const filePath = rootIndexPath
+    const fileSize = fs.statSync(filePath).size
+    const readStream = fs.createReadStream(filePath)
+    res.writeHead(200, {
+      "Content-Length": fileSize,
+      "Content-Type": "text/html",
+      "Accept-Ranges": "bytes",
+    })
+    readStream.pipe(res)
+    return
+  }
+
+  if (
+    isFolder(requestedPath) &&
+    isFile(indexPath) &&
+    reqUrl.pathname.endsWith("/")
+  ) {
+    const filePath = indexPath
+    const fileSize = fs.statSync(filePath).size
+    const readStream = fs.createReadStream(filePath)
+    res.writeHead(200, {
+      "Content-Length": fileSize,
+      "Content-Type": "text/html",
+      "Accept-Ranges": "bytes",
+    })
+    readStream.pipe(res)
+    return
+  }
+
+  if (
+    isFolder(requestedPath) &&
+    isFile(indexPath) &&
+    !reqUrl.pathname.endsWith("/")
+  ) {
+    res.writeHead(302, {
+      Location: reqUrl.pathname + "/",
+    })
+    res.end()
+    return
+  }
 
   if (!fs.existsSync(requestedPath)) {
     res.writeHead(404, {
@@ -114,7 +133,7 @@ const handleRequest = (req, res) => {
         (isFolder(requestedPath + "/" + file) ? "[DIR]" : "") +
         '</td><td><a href="' +
         folderName +
-        "/" +
+        (folderName.endsWith("/") ? "" : "/") +
         file +
         '">' +
         file +
