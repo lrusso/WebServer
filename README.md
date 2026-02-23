@@ -22,7 +22,7 @@ This workaround is useful for testing purposes because, for example, a Web App m
 2. Start the server: ```forever start -a -l /dev/null -c node server.js > /dev/null 2>&1```
 3. Stop the server: ```forever stop -a -l /dev/null -c node server.js > /dev/null 2>&1```
 
-## How to launch the server on startup (MacOS)
+## How to launch the server on startup (macOS)
 
 - Run `nano ~/Library/LaunchAgents/com.lrusso.server.plist`
 - Assuming that you have the server folder path in `/Users/lrusso/Server`, paste the following code:
