@@ -132,7 +132,7 @@ const handleRequest = (req, res) => {
 
     res.writeHead(200, {
       "Content-Length": fileSize,
-      "Content-Type": "text/html",
+      "Content-Type": "text/html; charset=utf-8",
       "Accept-Ranges": "bytes",
       "Last-Modified": fs.statSync(filePath).mtime.toUTCString(),
     })
@@ -158,7 +158,7 @@ const handleRequest = (req, res) => {
     readStream.on("error", () => res.destroy())
     res.writeHead(200, {
       "Content-Length": fileSize,
-      "Content-Type": "text/html",
+      "Content-Type": "text/html; charset=utf-8",
       "Accept-Ranges": "bytes",
       "Last-Modified": fs.statSync(filePath).mtime.toUTCString(),
     })
@@ -253,7 +253,7 @@ const handleRequest = (req, res) => {
 
     const contentFooter = `</table><hr></body></html>`
 
-    // the length is in bytes, so the names with accents (e.g. canción) aren't cut
+    // the length is in bytes, so the names with accents aren't cut
     res.writeHead(200, {
       "Content-Length": Buffer.byteLength(
         contentHeader + contentBody + contentFooter
@@ -308,37 +308,38 @@ const handleRequest = (req, res) => {
       return
     }
 
+    // the text files are sent as utf-8, so their accents are not shown garbled
     const getMimeType = () => {
       switch (fileExtension) {
         case "html":
-          return "text/html"
+          return "text/html; charset=utf-8"
 
         case "htm":
-          return "text/html"
+          return "text/html; charset=utf-8"
 
         case "xhtml":
           return "application/xhtml+xml"
 
         case "css":
-          return "text/css"
+          return "text/css; charset=utf-8"
 
         case "csv":
-          return "text/csv"
+          return "text/csv; charset=utf-8"
 
         case "tsv":
-          return "text/tab-separated-values"
+          return "text/tab-separated-values; charset=utf-8"
 
         case "pdf":
           return "application/pdf"
 
         case "js":
-          return "text/javascript"
+          return "text/javascript; charset=utf-8"
 
         case "mjs":
-          return "text/javascript"
+          return "text/javascript; charset=utf-8"
 
         case "cjs":
-          return "text/javascript"
+          return "text/javascript; charset=utf-8"
 
         case "wasm":
           return "application/wasm"
@@ -389,37 +390,37 @@ const handleRequest = (req, res) => {
           return "application/vnd.google-earth.kmz"
 
         case "txt":
-          return "text/plain"
+          return "text/plain; charset=utf-8"
 
         case "log":
-          return "text/plain"
+          return "text/plain; charset=utf-8"
 
         case "ics":
-          return "text/calendar"
+          return "text/calendar; charset=utf-8"
 
         case "vcf":
-          return "text/vcard"
+          return "text/vcard; charset=utf-8"
 
         case "vtt":
-          return "text/vtt"
+          return "text/vtt; charset=utf-8"
 
         case "srt":
           return "application/x-subrip"
 
         case "py":
-          return "text/x-python"
+          return "text/x-python; charset=utf-8"
 
         case "c":
-          return "text/x-c"
+          return "text/x-c; charset=utf-8"
 
         case "h":
-          return "text/x-c"
+          return "text/x-c; charset=utf-8"
 
         case "cpp":
-          return "text/x-c++"
+          return "text/x-c++; charset=utf-8"
 
         case "java":
-          return "text/x-java-source"
+          return "text/x-java-source; charset=utf-8"
 
         case "sh":
           return "application/x-sh"
@@ -431,10 +432,10 @@ const handleRequest = (req, res) => {
           return "application/x-tex"
 
         case "md":
-          return "text/markdown"
+          return "text/markdown; charset=utf-8"
 
         case "markdown":
-          return "text/markdown"
+          return "text/markdown; charset=utf-8"
 
         case "zip":
           return "application/zip"
