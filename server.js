@@ -44,6 +44,21 @@ const getLocalPath = (pathname) => {
   }
 }
 
+const encodePath = (path) => {
+  // each part of the path is encoded, so the names with "#", "?", "%" or
+  // spaces still work as links
+  return path.split("/").map(encodeURIComponent).join("/")
+}
+
+const escapeHTML = (text) => {
+  // the names are shown as text, so a name like <b>hola.txt isn't taken as html
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+}
+
 const handleRequest = (req, res) => {
   const baseURL =
     (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
@@ -135,15 +150,15 @@ const handleRequest = (req, res) => {
 
     const contentHeader =
       `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Index of ` +
-      (folderName !== "" ? folderName : "/") +
+      (folderName !== "" ? escapeHTML(folderName) : "/") +
       `</title></head><body><h1>Index of ` +
-      (folderName !== "" ? folderName : "/") +
+      (folderName !== "" ? escapeHTML(folderName) : "/") +
       `</h1><hr><table>`
 
     let contentBody =
       fileName !== ROOT_FOLDER
         ? `<tr><td>[DIR]</td><td><a href="` +
-          (folderUp !== "" ? folderUp : "/") +
+          (folderUp !== "" ? encodePath(folderUp) : "/") +
           `">..</a></td></tr>`
         : ""
     folderContent.forEach((file) => {
@@ -152,19 +167,19 @@ const handleRequest = (req, res) => {
         "<tr><td>" +
         (isFolder(requestedPath + "/" + file) ? "[DIR]" : "") +
         '</td><td><a href="' +
-        folderName +
-        (folderName.endsWith("/") ? "" : "/") +
-        file +
+        encodePath(folderName + (folderName.endsWith("/") ? "" : "/") + file) +
         '">' +
-        file +
+        escapeHTML(file) +
         "</a></td></tr>"
     })
 
     const contentFooter = `</table><hr></body></html>`
 
+    // the length is in bytes, so the names with accents (e.g. canción) aren't cut
     res.writeHead(200, {
-      "Content-Length":
-        contentHeader.length + contentBody.length + contentFooter.length,
+      "Content-Length": Buffer.byteLength(
+        contentHeader + contentBody + contentFooter
+      ),
       "Content-Type": "text/html",
     })
     res.write(contentHeader + contentBody + contentFooter)
@@ -176,15 +191,37 @@ const handleRequest = (req, res) => {
     const filePath = __dirname + decodeURIComponent(fileName)
     const fileExtension = fileName.split(".").pop().toLowerCase()
     const fileSize = fs.statSync(filePath).size
-    const fileRange = req.headers.range
-      ? req.headers.range.replace(/bytes=/, "").split("-")
-      : null
-    const fileRangeStart = fileRange ? parseInt(fileRange[0]) : null
-    const fileRangeEnd = fileRange
+    // only the byte ranges are supported, a range in any other unit is ignored
+    const fileRange =
+      req.headers.range && req.headers.range.startsWith("bytes=")
+        ? req.headers.range.replace(/bytes=/, "").split("-")
+        : null
+    let fileRangeStart = fileRange ? parseInt(fileRange[0]) : null
+    let fileRangeEnd = fileRange
       ? fileRange[1]
         ? parseInt(fileRange[1])
         : Math.min(fileRange[0] + CHUNK_SIZE_IN_MB * 1048576, fileSize - 1)
       : null
+
+    // a range without its start (e.g. bytes=-500) asks for the last bytes
+    if (fileRange && fileRange[0] === "") {
+      fileRangeStart = Math.max(fileSize - parseInt(fileRange[1]), 0)
+      fileRangeEnd = fileSize - 1
+    }
+
+    // a range that goes past the end of the file stops at its last byte
+    if (fileRangeEnd > fileSize - 1) {
+      fileRangeEnd = fileSize - 1
+    }
+
+    // a range that can't be served (e.g. starting after the end of the file)
+    if (fileRange && !(fileRangeStart <= fileRangeEnd)) {
+      res.writeHead(416, {
+        "Content-Range": "bytes */" + fileSize,
+      })
+      res.end()
+      return
+    }
 
     const getMimeType = () => {
       switch (fileExtension) {
@@ -344,8 +381,29 @@ const handleRequest = (req, res) => {
   }
 }
 
+const showServerError = (err, port) => {
+  if (err.code === "EADDRINUSE") {
+    console.log("\nError: Port " + port + " is already in use.\n")
+    console.log(
+      "Please close the application using that port or choose a different port.\n"
+    )
+  } else if (err.code === "EACCES") {
+    // on linux, the ports below 1024 (such as 80) require administrator privileges
+    console.log("\nError: Port " + port + " requires administrator privileges.\n")
+    console.log(
+      "Please run the server as administrator or choose a port above 1023.\n"
+    )
+  } else {
+    console.log(err)
+  }
+  process.exit(1)
+}
+
 try {
-  http.createServer(handleRequest).listen(serverPort)
+  http
+    .createServer(handleRequest)
+    .on("error", (err) => showServerError(err, serverPort))
+    .listen(serverPort)
 } catch (err) {
   console.log(err)
 }
@@ -364,6 +422,7 @@ try {
       },
       handleRequest
     )
+    .on("error", (err) => showServerError(err, serverSSLPort))
     .listen(serverSSLPort)
 } catch (err) {
   console.log(err)
