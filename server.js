@@ -1,8 +1,10 @@
 const https = require("https")
 const http = require("http")
 const fs = require("fs")
+const { join, sep } = require("path")
 
 const ROOT_FOLDER = "/public"
+const PUBLIC_FOLDER = join(__dirname, ROOT_FOLDER)
 const ERROR_FILE_NOT_FOUND = "File Not Found"
 const ERROR_INTERNAL_SERVER_ERROR = "Internal Server Error"
 
@@ -30,6 +32,18 @@ const isFile = (path) => {
   }
 }
 
+const getLocalPath = (pathname) => {
+  try {
+    const localPath = join(PUBLIC_FOLDER, decodeURIComponent(pathname))
+
+    // paths outside the public folder (e.g. an encoded "../") are not served
+    return (localPath + sep).startsWith(PUBLIC_FOLDER + sep) ? localPath : null
+  } catch (err) {
+    // malformed urls (e.g. a lone "%") can't be decoded
+    return null
+  }
+}
+
 const handleRequest = (req, res) => {
   const baseURL =
     (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
@@ -39,14 +53,29 @@ const handleRequest = (req, res) => {
   let fileName =
     reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
 
-  const requestedPath = __dirname + decodeURIComponent(fileName)
-  const indexPath = __dirname + decodeURIComponent(fileName) + "/index.html"
-  const rootIndexPath = __dirname + decodeURIComponent(ROOT_FOLDER) + "/index.html"
+  const requestedPath = getLocalPath(reqUrl.pathname)
+
+  if (!requestedPath || !fs.existsSync(requestedPath)) {
+    res.writeHead(404, {
+      "Content-Length": ERROR_FILE_NOT_FOUND.length,
+      "Content-Type": "text/plain",
+    })
+    res.write(ERROR_FILE_NOT_FOUND)
+    res.end()
+    return
+  }
+
+  const indexPath = requestedPath + "/index.html"
+  const rootIndexPath = PUBLIC_FOLDER + "/index.html"
 
   if (reqUrl.pathname === "/" && isFile(rootIndexPath)) {
     const filePath = rootIndexPath
     const fileSize = fs.statSync(filePath).size
     const readStream = fs.createReadStream(filePath)
+
+    // a file that can't be read closes the connection instead of the server
+    readStream.on("error", () => res.destroy())
+
     res.writeHead(200, {
       "Content-Length": fileSize,
       "Content-Type": "text/html",
@@ -64,6 +93,7 @@ const handleRequest = (req, res) => {
     const filePath = indexPath
     const fileSize = fs.statSync(filePath).size
     const readStream = fs.createReadStream(filePath)
+    readStream.on("error", () => res.destroy())
     res.writeHead(200, {
       "Content-Length": fileSize,
       "Content-Type": "text/html",
@@ -81,16 +111,6 @@ const handleRequest = (req, res) => {
     res.writeHead(302, {
       Location: reqUrl.pathname + "/",
     })
-    res.end()
-    return
-  }
-
-  if (!fs.existsSync(requestedPath)) {
-    res.writeHead(404, {
-      "Content-Length": ERROR_FILE_NOT_FOUND.length,
-      "Content-Type": "text/plain",
-    })
-    res.write(ERROR_FILE_NOT_FOUND)
     res.end()
     return
   }
@@ -294,6 +314,7 @@ const handleRequest = (req, res) => {
       filePath,
       fileRange ? { start: fileRangeStart, end: fileRangeEnd } : undefined
     )
+    readStream.on("error", () => res.destroy())
 
     if (fileRange) {
       res.writeHead(206, {
