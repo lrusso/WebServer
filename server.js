@@ -2,7 +2,7 @@ const https = require("https")
 const http = require("http")
 const fs = require("fs")
 const os = require("os")
-const { join, sep } = require("path")
+const { basename, join, sep } = require("path")
 
 const ROOT_FOLDER = "/public"
 const PUBLIC_FOLDER = join(__dirname, ROOT_FOLDER)
@@ -26,6 +26,18 @@ if (!/^\d+$/.test(serverPort) || serverPort < 1 || serverPort > 65535) {
 if (!/^\d+$/.test(serverSSLPort) || serverSSLPort < 1 || serverSSLPort > 65535) {
   console.log("\nError: Port " + serverSSLPort + " is not valid.\n")
   console.log("Please choose a port between 1 and 65535.\n")
+  process.exit(0)
+}
+
+// the public folder is created if it doesn't exist (e.g. deleted by the user)
+try {
+  fs.mkdirSync(PUBLIC_FOLDER, { recursive: true })
+} catch (err) {
+  // e.g. without permission to write there, or with a file that has its name
+  console.log(
+    "\nError: The " + basename(err.path) + " folder couldn't be created.\n"
+  )
+  console.log(err.message + "\n")
   process.exit(0)
 }
 
