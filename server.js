@@ -14,6 +14,20 @@ const args = process.argv?.slice(2)
 const serverPort = args.length > 0 ? args[0] : 80
 const serverSSLPort = args.length > 1 ? args[1] : 443
 
+// a port that isn't a number (e.g. "abc" would be taken as the name of a socket
+// file) or that is out of range can't be used
+if (!/^\d+$/.test(serverPort) || serverPort < 1 || serverPort > 65535) {
+  console.log("\nError: Port " + serverPort + " is not valid.\n")
+  console.log("Please choose a port between 1 and 65535.\n")
+  process.exit(0)
+}
+
+if (!/^\d+$/.test(serverSSLPort) || serverSSLPort < 1 || serverSSLPort > 65535) {
+  console.log("\nError: Port " + serverSSLPort + " is not valid.\n")
+  console.log("Please choose a port between 1 and 65535.\n")
+  process.exit(0)
+}
+
 const isFolder = (path) => {
   try {
     const stats = fs.statSync(path)
@@ -180,12 +194,27 @@ const handleRequest = (req, res) => {
   }
 
   if (isFolder(requestedPath)) {
+    let folderFiles = null
+    try {
+      folderFiles = fs.readdirSync(requestedPath)
+    } catch (err) {
+      // a folder that can't be read (e.g. without permissions) returns an error
+      // instead of closing the server
+      res.writeHead(500, {
+        "Content-Length": ERROR_INTERNAL_SERVER_ERROR.length,
+        "Content-Type": "text/plain",
+      })
+      res.write(ERROR_INTERNAL_SERVER_ERROR)
+      res.end()
+      return
+    }
+
     const folderName = decodeURIComponent(requestedFilename).substring(
       ROOT_FOLDER.length,
       decodeURIComponent(requestedFilename).length
     )
     const folderUp = folderName.substring(0, folderName.lastIndexOf("/"))
-    const folderContent = fs.readdirSync(requestedPath).sort((a, b) => {
+    const folderContent = folderFiles.sort((a, b) => {
       const aIsDir = isFolder(requestedPath + "/" + a),
         bIsDir = isFolder(requestedPath + "/" + b)
       if (aIsDir && !bIsDir) {
