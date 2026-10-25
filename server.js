@@ -257,11 +257,17 @@ const handleRequest = (req, res) => {
         case "htm":
           return "text/html"
 
+        case "xhtml":
+          return "application/xhtml+xml"
+
         case "css":
           return "text/css"
 
         case "csv":
           return "text/csv"
+
+        case "tsv":
+          return "text/tab-separated-values"
 
         case "pdf":
           return "application/pdf"
@@ -269,17 +275,125 @@ const handleRequest = (req, res) => {
         case "js":
           return "text/javascript"
 
+        case "mjs":
+          return "text/javascript"
+
+        case "cjs":
+          return "text/javascript"
+
+        case "wasm":
+          return "application/wasm"
+
         case "json":
           return "application/json"
+
+        case "jsonld":
+          return "application/ld+json"
+
+        case "map":
+          return "application/json"
+
+        case "webmanifest":
+          return "application/manifest+json"
+
+        case "xml":
+          return "application/xml"
+
+        case "xsl":
+          return "application/xslt+xml"
+
+        case "rss":
+          return "application/rss+xml"
+
+        case "atom":
+          return "application/atom+xml"
+
+        case "yaml":
+          return "application/yaml"
+
+        case "yml":
+          return "application/yaml"
+
+        case "toml":
+          return "application/toml"
+
+        case "geojson":
+          return "application/geo+json"
+
+        case "gpx":
+          return "application/gpx+xml"
+
+        case "kml":
+          return "application/vnd.google-earth.kml+xml"
+
+        case "kmz":
+          return "application/vnd.google-earth.kmz"
 
         case "txt":
           return "text/plain"
 
+        case "log":
+          return "text/plain"
+
+        case "ics":
+          return "text/calendar"
+
+        case "vcf":
+          return "text/vcard"
+
+        case "vtt":
+          return "text/vtt"
+
+        case "srt":
+          return "application/x-subrip"
+
+        case "py":
+          return "text/x-python"
+
+        case "c":
+          return "text/x-c"
+
+        case "h":
+          return "text/x-c"
+
+        case "cpp":
+          return "text/x-c++"
+
+        case "java":
+          return "text/x-java-source"
+
+        case "sh":
+          return "application/x-sh"
+
+        case "sql":
+          return "application/sql"
+
+        case "tex":
+          return "application/x-tex"
+
         case "md":
+          return "text/markdown"
+
+        case "markdown":
           return "text/markdown"
 
         case "zip":
           return "application/zip"
+
+        case "tar":
+          return "application/x-tar"
+
+        case "tgz":
+          return "application/gzip"
+
+        case "bz2":
+          return "application/x-bzip2"
+
+        case "xz":
+          return "application/x-xz"
+
+        case "zst":
+          return "application/zstd"
 
         case "7z":
           return "application/x-7z-compressed"
@@ -293,8 +407,50 @@ const handleRequest = (req, res) => {
         case "epub":
           return "application/epub+zip"
 
+        case "mobi":
+          return "application/x-mobipocket-ebook"
+
+        case "azw":
+          return "application/vnd.amazon.ebook"
+
         case "rtf":
           return "application/rtf"
+
+        case "odt":
+          return "application/vnd.oasis.opendocument.text"
+
+        case "ods":
+          return "application/vnd.oasis.opendocument.spreadsheet"
+
+        case "odp":
+          return "application/vnd.oasis.opendocument.presentation"
+
+        case "odg":
+          return "application/vnd.oasis.opendocument.graphics"
+
+        case "pages":
+          return "application/vnd.apple.pages"
+
+        case "numbers":
+          return "application/vnd.apple.numbers"
+
+        case "key":
+          return "application/vnd.apple.keynote"
+
+        case "ps":
+          return "application/postscript"
+
+        case "eps":
+          return "application/postscript"
+
+        case "ai":
+          return "application/postscript"
+
+        case "xps":
+          return "application/vnd.ms-xpsdocument"
+
+        case "djvu":
+          return "image/vnd.djvu"
 
         case "doc":
           return "application/msword"
@@ -314,8 +470,38 @@ const handleRequest = (req, res) => {
         case "pptx":
           return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
+        case "apk":
+          return "application/vnd.android.package-archive"
+
+        case "jar":
+          return "application/java-archive"
+
+        case "deb":
+          return "application/vnd.debian.binary-package"
+
+        case "rpm":
+          return "application/x-rpm"
+
+        case "dmg":
+          return "application/x-apple-diskimage"
+
+        case "iso":
+          return "application/x-iso9660-image"
+
+        case "torrent":
+          return "application/x-bittorrent"
+
+        case "crt":
+          return "application/x-x509-ca-cert"
+
         case "mp3":
           return "audio/mpeg"
+
+        case "m4a":
+          return "audio/mp4"
+
+        case "opus":
+          return "audio/opus"
 
         case "aac":
           return "audio/aac"
@@ -326,20 +512,80 @@ const handleRequest = (req, res) => {
         case "wav":
           return "audio/wav"
 
+        case "aif":
+          return "audio/aiff"
+
+        case "aiff":
+          return "audio/aiff"
+
         case "ogg":
           return "audio/ogg"
+
+        case "oga":
+          return "audio/ogg"
+
+        case "weba":
+          return "audio/webm"
+
+        case "mid":
+          return "audio/midi"
+
+        case "midi":
+          return "audio/midi"
+
+        case "amr":
+          return "audio/amr"
+
+        case "wma":
+          return "audio/x-ms-wma"
+
+        case "mka":
+          return "audio/x-matroska"
 
         case "mp4":
           return "video/mp4"
 
+        case "m4v":
+          return "video/mp4"
+
+        case "webm":
+          return "video/webm"
+
+        case "mov":
+          return "video/quicktime"
+
+        case "ogv":
+          return "video/ogg"
+
         case "avi":
           return "video/x-msvideo"
+
+        case "wmv":
+          return "video/x-ms-wmv"
+
+        case "flv":
+          return "video/x-flv"
+
+        case "asf":
+          return "video/x-ms-asf"
 
         case "3gp":
           return "video/3gpp"
 
+        case "3g2":
+          return "video/3gpp2"
+
         case "mkv":
           return "video/x-matroska"
+
+        case "ts":
+          return "video/mp2t"
+
+        case "m3u8":
+          return "application/vnd.apple.mpegurl"
+
+        case "mpd":
+          return "application/dash+xml"
 
         case "mpg":
           return "video/mpeg"
@@ -353,10 +599,22 @@ const handleRequest = (req, res) => {
         case "png":
           return "image/png"
 
+        case "apng":
+          return "image/apng"
+
+        case "webp":
+          return "image/webp"
+
+        case "avif":
+          return "image/avif"
+
         case "jpg":
           return "image/jpeg"
 
         case "jpeg":
+          return "image/jpeg"
+
+        case "jfif":
           return "image/jpeg"
 
         case "gif":
@@ -365,8 +623,56 @@ const handleRequest = (req, res) => {
         case "bmp":
           return "image/bmp"
 
+        case "tif":
+          return "image/tiff"
+
+        case "tiff":
+          return "image/tiff"
+
+        case "heic":
+          return "image/heic"
+
+        case "heif":
+          return "image/heif"
+
+        case "jxl":
+          return "image/jxl"
+
+        case "psd":
+          return "image/vnd.adobe.photoshop"
+
         case "svg":
           return "image/svg+xml"
+
+        case "woff":
+          return "font/woff"
+
+        case "woff2":
+          return "font/woff2"
+
+        case "ttf":
+          return "font/ttf"
+
+        case "otf":
+          return "font/otf"
+
+        case "eot":
+          return "application/vnd.ms-fontobject"
+
+        case "glb":
+          return "model/gltf-binary"
+
+        case "gltf":
+          return "model/gltf+json"
+
+        case "stl":
+          return "model/stl"
+
+        case "obj":
+          return "model/obj"
+
+        case "usdz":
+          return "model/vnd.usdz+zip"
 
         default:
           return "application/octet-stream"
