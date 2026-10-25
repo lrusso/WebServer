@@ -62,7 +62,20 @@ const escapeHTML = (text) => {
 const handleRequest = (req, res) => {
   const baseURL =
     (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
-  const reqUrl = new URL(req.url, baseURL)
+  let reqUrl = null
+  try {
+    reqUrl = new URL(req.url, baseURL)
+  } catch (err) {
+    // the urls that can't be parsed (e.g. "//" or a wrong host) are handled as
+    // a missing file
+    res.writeHead(404, {
+      "Content-Length": ERROR_FILE_NOT_FOUND.length,
+      "Content-Type": "text/plain",
+    })
+    res.write(ERROR_FILE_NOT_FOUND)
+    res.end()
+    return
+  }
 
   const requestedFilename =
     reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
@@ -123,6 +136,21 @@ const handleRequest = (req, res) => {
   ) {
     res.writeHead(302, {
       Location: reqUrl.pathname + "/",
+    })
+    res.end()
+    return
+  }
+
+  // a folder without an index.html is listed without the trailing slash (the
+  // root is the exception, since its url always ends with a slash)
+  if (
+    isFolder(requestedPath) &&
+    !isFile(indexPath) &&
+    reqUrl.pathname.endsWith("/") &&
+    reqUrl.pathname !== "/"
+  ) {
+    res.writeHead(302, {
+      Location: reqUrl.pathname.replace(/\/+$/, ""),
     })
     res.end()
     return
