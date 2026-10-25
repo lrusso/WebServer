@@ -64,10 +64,8 @@ const handleRequest = (req, res) => {
     (req.protocol ? req.protocol : "http") + "://" + req.headers.host + "/"
   const reqUrl = new URL(req.url, baseURL)
 
-  // IF THERE IS NO FILENAME IN THE URL, USING THE DEFAULT FILENAME
-  let fileName =
+  const requestedFilename =
     reqUrl.pathname === "/" ? ROOT_FOLDER : ROOT_FOLDER + reqUrl.pathname
-
   const requestedPath = getLocalPath(reqUrl.pathname)
 
   if (!requestedPath || !fs.existsSync(requestedPath)) {
@@ -131,9 +129,9 @@ const handleRequest = (req, res) => {
   }
 
   if (isFolder(requestedPath)) {
-    const folderName = decodeURIComponent(fileName).substring(
+    const folderName = decodeURIComponent(requestedFilename).substring(
       ROOT_FOLDER.length,
-      decodeURIComponent(fileName).length
+      decodeURIComponent(requestedFilename).length
     )
     const folderUp = folderName.substring(0, folderName.lastIndexOf("/"))
     const folderContent = fs.readdirSync(requestedPath).sort((a, b) => {
@@ -156,7 +154,7 @@ const handleRequest = (req, res) => {
       `</h1><hr><table>`
 
     let contentBody =
-      fileName !== ROOT_FOLDER
+      requestedFilename !== ROOT_FOLDER
         ? `<tr><td>[DIR]</td><td><a href="` +
           (folderUp !== "" ? encodePath(folderUp) : "/") +
           `">..</a></td></tr>`
@@ -188,8 +186,8 @@ const handleRequest = (req, res) => {
   }
 
   try {
-    const filePath = __dirname + decodeURIComponent(fileName)
-    const fileExtension = fileName.split(".").pop().toLowerCase()
+    const filePath = __dirname + decodeURIComponent(requestedFilename)
+    const fileExtension = requestedFilename.split(".").pop().toLowerCase()
     const fileSize = fs.statSync(filePath).size
     // only the byte ranges are supported, a range in any other unit is ignored
     const fileRange =
@@ -403,6 +401,14 @@ try {
   http
     .createServer(handleRequest)
     .on("error", (err) => showServerError(err, serverPort))
+    .on("listening", () => {
+      console.log("\nServer running.\n")
+      console.log(
+        "Browse to http://localhost" +
+          (serverPort !== 80 ? ":" + serverPort : "") +
+          "\n"
+      )
+    })
     .listen(serverPort)
 } catch (err) {
   console.log(err)
