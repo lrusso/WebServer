@@ -1,6 +1,7 @@
 const https = require("https")
 const http = require("http")
 const fs = require("fs")
+const os = require("os")
 const { join, sep } = require("path")
 
 const ROOT_FOLDER = "/public"
@@ -793,17 +794,29 @@ const showServerError = (err, port) => {
   process.exit(0)
 }
 
+const getNetworkAddresses = () => {
+  // the ipv4 addresses of this computer in its local networks (e.g. wi-fi)
+  return Object.values(os.networkInterfaces())
+    .flat()
+    .filter((address) => address.family === "IPv4" && !address.internal)
+    .map((address) => address.address)
+}
+
 try {
   http
     .createServer(handleRequest)
     .on("error", (err) => showServerError(err, serverPort))
     .on("listening", () => {
+      const port = Number(serverPort) !== 80 ? ":" + serverPort : ""
+
+      // the urls for browsing from this computer and from other devices on the
+      // network (e.g. a phone), listed with the same bullet as the chat
+      const urls = ["localhost"].concat(getNetworkAddresses()).map((host) => {
+        return "\u2022 http://" + host + port
+      })
+
       console.log("\nServer running.\n")
-      console.log(
-        "Browse to http://localhost" +
-          (Number(serverPort) !== 80 ? ":" + serverPort : "") +
-          "\n"
-      )
+      console.log("Open in your browser:\n\n" + urls.join("\n") + "\n")
     })
     .listen(serverPort)
 } catch (err) {
