@@ -801,7 +801,7 @@ try {
       console.log("\nServer running.\n")
       console.log(
         "Browse to http://localhost" +
-          (serverPort !== 80 ? ":" + serverPort : "") +
+          (Number(serverPort) !== 80 ? ":" + serverPort : "") +
           "\n"
       )
     })
