@@ -25,7 +25,7 @@ This workaround is useful for testing purposes because, for example, a Web App m
 ## How to launch the server on startup (macOS)
 
 - Run `nano ~/Library/LaunchAgents/com.lrusso.server.plist`
-- Assuming that you have the server folder path in `/Users/lrusso/Server`, paste the following code:
+- Assuming that you have the server folder path in `/Users/lrusso/Server` and Node.js in `/usr/local/bin/node` (run `which node` to check it), paste the following code:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
